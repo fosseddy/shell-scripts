@@ -2,22 +2,40 @@
 
 set -e
 
-target=$HOME/.local/lib/npm/bin/$1
-dest=$HOME/.local/bin
-
-if [[ -z $1 ]]; then
-    echo "provide executable name"
+if [[ $# -eq 0 ]]; then
+    echo "provide executable name[s]"
     exit 1
 fi
 
-if [[ ! -f $target ]]; then
-    echo "$target does not exist"
+error=0
+
+for f in $@; do
+    f=$HOME/.local/lib/npm/bin/$f
+
+    if [[ ! -f $f ]]; then
+        echo "$f does not exist"
+        error=1
+        continue
+    fi
+
+    if [[ ! -x $f ]]; then
+        echo "$f is not executable or user \`$USER\` does not have permission"
+        error=1
+        continue
+    fi
+done
+
+if [[ $error -eq 1 ]]; then
     exit 1
 fi
 
-if [[ ! -x $target ]]; then
-    echo "$target is not executable or user \`$USER\` does not have permission"
-    exit 1
-fi
+for f in $@; do
+    target=$HOME/.local/lib/npm/bin/$f
+    dest=$HOME/.local/bin/$f
 
-ln -sr $target $dest
+    if [[ -e $dest ]]; then
+        rm $dest
+    fi
+
+    ln -sr $target $dest
+done

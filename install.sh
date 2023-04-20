@@ -2,14 +2,6 @@
 
 set -e
 
-for f in *; do
-    if [[ ! -x $f ]]; then
-        continue
-    fi
-
-    if [[ $f = "install.sh" ]]; then
-        continue
-    fi
-
+for f in mknpmlink mkbuildsh; do
     cp $f $HOME/.local/bin
 done
